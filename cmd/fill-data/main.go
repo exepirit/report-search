@@ -47,13 +47,14 @@ func main() {
 	}
 
 	// fill with fake data
-	IterateGeneratedReports(2000, func(report data.Report) {
+	count := 20000
+	IterateGeneratedReports(count, func(report data.Report) {
 		err = indexer.Index(report)
 		if err != nil {
 			slog.Error("Cannot index report", "err", err)
 		}
 	})
-	slog.Info("Documents indexed")
+	slog.Info("Documents indexed", "count", count)
 }
 
 func CheckCollectionExists(client *typesense.Client, name string) (bool, error) {
