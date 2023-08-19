@@ -7,12 +7,20 @@ import (
 	"github.com/typesense/typesense-go/typesense"
 	"log/slog"
 	"os"
+	"strconv"
 )
 
 func main() {
 	typesenseURL := flag.String("typesense", "http://typesense:80", "Typesense entrypoint URL")
 	typesenseToken := flag.String("token", "apikey", "Typesense token")
+	countStr := flag.String("count", "2000", "Documents count")
 	flag.Parse()
+
+	count, err := strconv.Atoi(*countStr)
+	if err != nil {
+		slog.Error("Invalid documents count")
+		os.Exit(1)
+	}
 
 	client := typesense.NewClient(
 		typesense.WithServer(*typesenseURL),
@@ -47,7 +55,6 @@ func main() {
 	}
 
 	// fill with fake data
-	count := 20000
 	IterateGeneratedReports(count, func(report data.Report) {
 		err = indexer.Index(report)
 		if err != nil {

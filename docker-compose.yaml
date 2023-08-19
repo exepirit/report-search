@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  typesense:
+    image: typesense/typesense:0.25.0
+    ports:
+      - "6080:80/tcp"
+    environment:
+      TYPESENSE_API_KEY: "apikey"
+      TYPESENSE_DATA_DIR: "/tmp"
+    command: "./typesense-server -p 80"
+  application:
+    build:
+      context: .
+    ports:
+      - "8080:80/tcp"
+    environment:
+      TYPESENSE_URL: "http://typesense"
+      TYPESENSE_APIKEY: "apikey"
