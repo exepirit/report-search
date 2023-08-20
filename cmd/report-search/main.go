@@ -5,6 +5,7 @@ import (
 	"github.com/exepirit/report-search/internal/api"
 	"github.com/exepirit/report-search/internal/infrastructure"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func main() {
@@ -22,6 +23,9 @@ func main() {
 		CaseSensitive: false,
 		AppName:       "Report Search",
 	})
+	app.Use(logger.New(logger.Config{
+		Format: "[${ip}]:${port} ${status} - ${method} ${path}\n",
+	}))
 	api.Bind(app.Group("/api"))
 
 	err := app.Listen(*listenAddress)
