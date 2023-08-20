@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/exepirit/report-search/internal/data"
+	"github.com/exepirit/report-search/internal/fake"
 	"github.com/exepirit/report-search/internal/search"
 	"github.com/typesense/typesense-go/typesense"
 	"log/slog"
@@ -55,7 +56,8 @@ func main() {
 	}
 
 	// fill with fake data
-	IterateGeneratedReports(count, func(report data.Report) {
+	generator := fake.GofakeitGenerator{}
+	fake.IterateReports(generator, count, func(report data.Report) {
 		err = indexer.Index(report)
 		if err != nil {
 			slog.Error("Cannot index report", "err", err)

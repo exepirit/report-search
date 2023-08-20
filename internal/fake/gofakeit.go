@@ -1,45 +1,35 @@
-package main
+package fake
 
 import (
 	"fmt"
 	"github.com/brianvoe/gofakeit"
 	"github.com/exepirit/report-search/internal/data"
 	"github.com/google/uuid"
-	"log/slog"
 	"time"
 )
 
-func IterateGeneratedReports(count int, cb func(report data.Report)) {
-	for i := 0; i < count; i++ {
-		report := GenerateReport()
-		cb(report)
-		if i%200 == 0 {
-			slog.Info("Report generating is pending", "count", i)
-			slog.Info("Generated report example", "example", report)
-		}
-	}
-}
+type GofakeitGenerator struct{}
 
-func GenerateReport() data.Report {
+func (gen GofakeitGenerator) Generate() (data.Report, error) {
 	return data.Report{
 		ID:          uuid.New(),
 		SubjectID:   uuid.New(),
 		SubjectName: gofakeit.Word(),
-		Period:      GenerateReportPeriod(),
-		Author:      GenerateUser(),
-		Parts:       GenerateReportParts(),
-	}
+		Period:      gen.GenerateReportPeriod(),
+		Author:      gen.GenerateUser(),
+		Parts:       gen.GenerateReportParts(),
+	}, nil
 }
 
-func GenerateReportParts() []data.ReportPart {
+func (gen GofakeitGenerator) GenerateReportParts() []data.ReportPart {
 	parts := make([]data.ReportPart, gofakeit.Number(1, 20))
 	for i := 0; i < len(parts); i++ {
-		parts[i] = GenerateReportPart()
+		parts[i] = gen.GenerateReportPart()
 	}
 	return parts
 }
 
-func GenerateReportPart() data.ReportPart {
+func (GofakeitGenerator) GenerateReportPart() data.ReportPart {
 	return data.ReportPart{
 		ID: uuid.New(),
 		Content: gofakeit.Paragraph(
@@ -51,7 +41,7 @@ func GenerateReportPart() data.ReportPart {
 	}
 }
 
-func GenerateReportPeriod() data.ReportPeriod {
+func (GofakeitGenerator) GenerateReportPeriod() data.ReportPeriod {
 	startDate := gofakeit.Date()
 	finishDate := startDate.AddDate(0, 0, 7).Add(-time.Second)
 	deadline := gofakeit.DateRange(startDate, finishDate)
@@ -63,14 +53,14 @@ func GenerateReportPeriod() data.ReportPeriod {
 	}
 }
 
-func GenerateUser() data.User {
+func (GofakeitGenerator) GenerateUser() data.User {
 	return data.User{
 		ID:        int(gofakeit.Int16()),
-		ShortName: ShortenName(gofakeit.FirstName(), gofakeit.LastName()),
+		ShortName: shortenName(gofakeit.FirstName(), gofakeit.LastName()),
 	}
 }
 
-func ShortenName(firstName string, lastName string) string {
+func shortenName(firstName string, lastName string) string {
 	abbr := firstName[0]
 	return fmt.Sprintf("%s %c.", lastName, abbr)
 }
