@@ -7,19 +7,10 @@ import {searchReports} from "../Api";
 
 export const ReportsPage = () => {
   const [reports, setReports] = useState<Report[]>([]);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    searchReports('dolores')
-      .then(reports => {
-        setReports(reports);
-        setLoaded(true);
-      });
-  }, []);
 
   return <Container>
     <Row>
-      <Search/>
+      <Search onResultsChange={setReports}/>
     </Row>
     <Row>
       <ReportsList reports={reports} />
