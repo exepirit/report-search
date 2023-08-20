@@ -1,7 +1,8 @@
 import React from 'react';
+import { ReportsPage } from './Reports/Components';
 
 function App() {
-  return (<h1>Hello, World!</h1>);
+  return <ReportsPage />;
 }
 
 export default App;
