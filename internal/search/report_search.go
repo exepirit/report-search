@@ -33,8 +33,7 @@ func (search TypesenseReportSearch) Query() ReportSearchQuery {
 	return &typesenseSearchQuery{
 		client: search.Client,
 		query: &api.SearchCollectionParams{
-			PreSegmentedQuery: ref.Ref(true),
-			SnippetThreshold:  ref.Ref(search.HighlightThreshold),
+			SnippetThreshold: ref.Ref(search.HighlightThreshold),
 		},
 	}
 }
