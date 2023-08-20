@@ -10,8 +10,7 @@ services:
       TYPESENSE_DATA_DIR: "/tmp"
     command: "./typesense-server -p 80"
   application:
-    build:
-      context: .
+    image: 9ef09e9e12f2
     ports:
       - "8080:80/tcp"
     environment:

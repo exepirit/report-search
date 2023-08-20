@@ -1,22 +1,35 @@
-FROM golang:1.21-alpine3.17 as dev-env
+FROM golang:1.21-alpine3.17 as go-dev-env
 
-WORKDIR /app
+WORKDIR /build
 
 COPY go.* ./
 RUN go mod download
 
 COPY . ./
 
-FROM dev-env as builder
+FROM go-dev-env as go-builder
 
 RUN go build -o report-search ./cmd/report-search/
 RUN go build -o fill-data ./cmd/fill-data/
 
+FROM node:18.8.0 as js-builder
+
+WORKDIR /build
+
+COPY ./web/package.json ./web/package-lock.json ./
+RUN npm install
+
+COPY ./web ./
+RUN npm run build
+
 FROM alpine:3.17
 
-COPY ./entrypoint.sh /usr/bin/entrypoint.sh
-RUN chmod +x /usr/bin/entrypoint.sh
-COPY --from=builder /app/fill-data /usr/bin/fill-data
-COPY --from=builder /app/report-search /usr/bin/report-search
+WORKDIR /app
 
-CMD ["/usr/bin/entrypoint.sh"]
+COPY ./entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+COPY --from=go-builder /build/fill-data /app/fill-data
+COPY --from=go-builder /build/report-search /app/report-search
+COPY --from=js-builder /build/build /app/web/build
+
+CMD ["/app/entrypoint.sh"]

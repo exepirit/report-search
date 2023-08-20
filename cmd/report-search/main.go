@@ -26,6 +26,7 @@ func main() {
 	app.Use(logger.New(logger.Config{
 		Format: "[${ip}]:${port} ${status} - ${method} ${path}\n",
 	}))
+	app.Static("/", "./web/build")
 	api.Bind(app.Group("/api"))
 
 	err := app.Listen(*listenAddress)

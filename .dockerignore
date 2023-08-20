@@ -1,2 +1,5 @@
 .idea/
 .git/
+./web/node_modules
+./web/build
+Dockerfile
