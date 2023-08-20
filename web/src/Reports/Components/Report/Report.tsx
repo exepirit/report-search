@@ -13,8 +13,11 @@ export const Report = ({report}: ReportProps) => {
 
   return <Card>
     <Card.Header>
-      <span dangerouslySetInnerHTML={{__html: report.subjectName}}/>
-      <span>({formatDate(report.period.startDate)} - {formatDate(report.period.finishDate)})</span>
+      <b dangerouslySetInnerHTML={{__html: report.subjectName}}/>
+      <div>Written by&nbsp;
+        <span dangerouslySetInnerHTML={{__html: report.author.shortName}} />&nbsp;
+        in period {formatDate(report.period.startDate)} - {formatDate(report.period.finishDate)}
+      </div>
     </Card.Header>
     <Card.Body>
       {report.parts.map(part => (
