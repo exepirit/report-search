@@ -46,7 +46,7 @@ func GenerateReportPart() data.ReportPart {
 			gofakeit.Number(1, 4),  // paragraphCount
 			gofakeit.Number(1, 5),  // sentenceCount
 			gofakeit.Number(3, 15), // wordCount
-			".",                    // separator
+			"\n\n",                 // separator
 		),
 	}
 }
