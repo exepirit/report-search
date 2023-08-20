@@ -12,12 +12,16 @@ type GofakeitGenerator struct{}
 
 func (gen GofakeitGenerator) Generate() (data.Report, error) {
 	return data.Report{
-		ID:          uuid.New(),
-		SubjectID:   uuid.New(),
-		SubjectName: gofakeit.Word(),
-		Period:      gen.GenerateReportPeriod(),
-		Author:      gen.GenerateUser(),
-		Parts:       gen.GenerateReportParts(),
+		ID:        uuid.New(),
+		SubjectID: uuid.New(),
+		SubjectName: gofakeit.RandString([]string{
+			gofakeit.BeerName(),
+			gofakeit.City(),
+			gofakeit.Company(),
+		}),
+		Period: gen.GenerateReportPeriod(),
+		Author: gen.GenerateUser(),
+		Parts:  gen.GenerateReportParts(),
 	}, nil
 }
 

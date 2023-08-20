@@ -10,13 +10,18 @@ type ReportsGenerator interface {
 }
 
 func IterateReports(generator ReportsGenerator, n int, cb func(report data.Report)) {
-	for i := 0; i < n; i++ {
+	errorsCount := 0
+	for i := 0; i < n && errorsCount < 3; {
+
 		report, err := generator.Generate()
 		if err != nil {
-			slog.Warn("Reports generation interrupted", "err", err)
-			return
+			slog.Warn("Error occurred while report generation", "err", err)
+			errorsCount++
+			continue
 		}
 
 		cb(report)
+		errorsCount = 0
+		i++
 	}
 }

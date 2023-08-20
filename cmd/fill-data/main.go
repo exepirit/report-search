@@ -56,14 +56,17 @@ func main() {
 	}
 
 	// fill with fake data
+	counter := 0
 	generator := fake.GofakeitGenerator{}
 	fake.IterateReports(generator, count, func(report data.Report) {
 		err = indexer.Index(report)
 		if err != nil {
 			slog.Error("Cannot index report", "err", err)
 		}
+		counter++
+		slog.Info("Document indexed", "index", counter, "subjectName", report.SubjectName)
 	})
-	slog.Info("Documents indexed", "count", count)
+	slog.Info("Documents indexed", "count", counter)
 }
 
 func CheckCollectionExists(client *typesense.Client, name string) (bool, error) {
