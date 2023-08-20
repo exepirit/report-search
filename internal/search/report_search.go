@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/exepirit/report-search/internal/data"
 	"github.com/exepirit/report-search/internal/search/index"
+	"github.com/exepirit/report-search/pkg/ref"
 	"github.com/typesense/typesense-go/typesense"
 	"github.com/typesense/typesense-go/typesense/api"
 	"log/slog"
@@ -24,13 +25,17 @@ type ReportSearchQuery interface {
 }
 
 type TypesenseReportSearch struct {
-	Client *typesense.Client
+	Client             *typesense.Client
+	HighlightThreshold int
 }
 
 func (search TypesenseReportSearch) Query() ReportSearchQuery {
 	return &typesenseSearchQuery{
 		client: search.Client,
-		query:  &api.SearchCollectionParams{},
+		query: &api.SearchCollectionParams{
+			PreSegmentedQuery: ref.Ref(true),
+			SnippetThreshold:  ref.Ref(search.HighlightThreshold),
+		},
 	}
 }
 
@@ -42,13 +47,14 @@ type typesenseSearchQuery struct {
 
 func (q *typesenseSearchQuery) ContainsText(text string) ReportSearchQuery {
 	q.query.Q = text
-	q.query.QueryBy = "subjectName, author.shortName, parts.content"
+	q.query.QueryBy = "subjectName,author.shortName,parts.content"
 	return q
 }
 
 func (q *typesenseSearchQuery) WrittenInPeriod(startDate, finishDate time.Time) ReportSearchQuery {
 	filterBy := fmt.Sprintf("period.deadline:>=%d && period.deadline:<=%d", startDate.Unix(), finishDate.Unix())
 	q.query.FilterBy = &filterBy
+	q.query.HighlightFields = &filterBy
 	return q
 }
 
@@ -58,13 +64,15 @@ func (q *typesenseSearchQuery) WithHighlights() ReportSearchQuery {
 }
 
 func (q *typesenseSearchQuery) GetAll() ([]data.Report, error) {
+	searchStart := time.Now()
 	result, err := q.client.Collection(ReportsCollectionName).Documents().Search(q.query)
 	if err != nil {
 		return nil, err
 	}
 	slog.Info("Documents found",
-		"latency", *result.SearchTimeMs,
-		"count", *result.Found)
+		"latency", time.Now().Sub(searchStart).String(),
+		"count", *result.Found,
+		"returned", len(*result.Hits))
 
 	reports := make([]data.Report, len(*result.Hits))
 	for i, hit := range *result.Hits {

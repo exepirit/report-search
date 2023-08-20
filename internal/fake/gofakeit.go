@@ -5,6 +5,7 @@ import (
 	"github.com/brianvoe/gofakeit"
 	"github.com/exepirit/report-search/internal/data"
 	"github.com/google/uuid"
+	"strings"
 	"time"
 )
 
@@ -26,7 +27,7 @@ func (gen GofakeitGenerator) Generate() (data.Report, error) {
 }
 
 func (gen GofakeitGenerator) GenerateReportParts() []data.ReportPart {
-	parts := make([]data.ReportPart, gofakeit.Number(1, 20))
+	parts := make([]data.ReportPart, gofakeit.Number(1, 15))
 	for i := 0; i < len(parts); i++ {
 		parts[i] = gen.GenerateReportPart()
 	}
@@ -34,14 +35,20 @@ func (gen GofakeitGenerator) GenerateReportParts() []data.ReportPart {
 }
 
 func (GofakeitGenerator) GenerateReportPart() data.ReportPart {
-	return data.ReportPart{
-		ID: uuid.New(),
-		Content: gofakeit.Paragraph(
-			gofakeit.Number(1, 4),  // paragraphCount
+	paragraphs := make([]string, 2)
+	for i := 0; i < len(paragraphs); i++ {
+		paragraphs[i] = gofakeit.Paragraph(
+			1,                      // paragraphCount
 			gofakeit.Number(1, 5),  // sentenceCount
-			gofakeit.Number(3, 15), // wordCount
-			"\n\n",                 // separator
-		),
+			gofakeit.Number(3, 10), // wordCount,
+			"",                     // separator
+		)
+		paragraphs[i] = fmt.Sprintf("<p>%s</p>", paragraphs[i])
+	}
+
+	return data.ReportPart{
+		ID:      uuid.New(),
+		Content: strings.Join(paragraphs, ""),
 	}
 }
 

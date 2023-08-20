@@ -19,7 +19,8 @@ func SearchReport(ctx *fiber.Ctx) error {
 	}
 
 	var reportSearch search.ReportSearch = &search.TypesenseReportSearch{
-		Client: infrastructure.GetTypesenseClient(),
+		Client:             infrastructure.GetTypesenseClient(),
+		HighlightThreshold: 2000,
 	}
 
 	searchStart := time.Now()
