@@ -47,7 +47,7 @@ type typesenseSearchQuery struct {
 
 func (q *typesenseSearchQuery) ContainsText(text string) ReportSearchQuery {
 	q.query.Q = text
-	q.query.QueryBy = "subjectName,author.shortName,parts.content"
+	q.query.QueryBy = "subjectName, author.shortName, parts.content"
 	return q
 }
 
