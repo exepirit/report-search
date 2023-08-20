@@ -18,6 +18,7 @@ type ReportSearch interface {
 type ReportSearchQuery interface {
 	ContainsText(text string) ReportSearchQuery
 	WrittenInPeriod(startDate, finishDate time.Time) ReportSearchQuery
+	WithHighlights() ReportSearchQuery
 	GetAll() ([]data.Report, error)
 	GetN(n int) ([]data.Report, error)
 }
@@ -34,8 +35,9 @@ func (search TypesenseReportSearch) Query() ReportSearchQuery {
 }
 
 type typesenseSearchQuery struct {
-	client *typesense.Client
-	query  *api.SearchCollectionParams
+	client        *typesense.Client
+	query         *api.SearchCollectionParams
+	highlightHits bool
 }
 
 func (q *typesenseSearchQuery) ContainsText(text string) ReportSearchQuery {
@@ -50,6 +52,11 @@ func (q *typesenseSearchQuery) WrittenInPeriod(startDate, finishDate time.Time) 
 	return q
 }
 
+func (q *typesenseSearchQuery) WithHighlights() ReportSearchQuery {
+	q.highlightHits = true
+	return q
+}
+
 func (q *typesenseSearchQuery) GetAll() ([]data.Report, error) {
 	result, err := q.client.Collection(ReportsCollectionName).Documents().Search(q.query)
 	if err != nil {
@@ -61,6 +68,11 @@ func (q *typesenseSearchQuery) GetAll() ([]data.Report, error) {
 
 	reports := make([]data.Report, len(*result.Hits))
 	for i, hit := range *result.Hits {
+		document := *hit.Document
+		if q.highlightHits && hit.Highlight != nil {
+			document = ApplyTypesenseHighlights(document, *hit.Highlight)
+		}
+
 		// dirty-dirty hack, but it works
 		var indexedReport index.Report
 		if err = mapToStruct(*hit.Document, &indexedReport); err != nil {

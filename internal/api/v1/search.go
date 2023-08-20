@@ -4,7 +4,9 @@ import (
 	"github.com/exepirit/report-search/internal/infrastructure"
 	"github.com/exepirit/report-search/internal/search"
 	"github.com/gofiber/fiber/v2"
+	"log/slog"
 	"net/http"
+	"time"
 )
 
 func SearchReport(ctx *fiber.Ctx) error {
@@ -20,13 +22,19 @@ func SearchReport(ctx *fiber.Ctx) error {
 		Client: infrastructure.GetTypesenseClient(),
 	}
 
+	searchStart := time.Now()
+
 	reports, err := reportSearch.
 		Query().
 		ContainsText(text).
+		WithHighlights().
 		GetAll()
 	if err != nil {
 		return err
 	}
+
+	slog.Info("Fulltext search completed",
+		"latency", time.Now().Sub(searchStart).String())
 
 	return ctx.Status(http.StatusOK).JSON(reports)
 }
