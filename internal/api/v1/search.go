@@ -28,7 +28,7 @@ func SearchReport(ctx *fiber.Ctx) error {
 		Query().
 		ContainsText(text).
 		WithHighlights().
-		GetAll()
+		GetN(20)
 	if err != nil {
 		return err
 	}
