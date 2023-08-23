@@ -5,6 +5,7 @@ import (
 	"github.com/exepirit/report-search/internal/data"
 	"github.com/exepirit/report-search/internal/fake"
 	"github.com/exepirit/report-search/internal/search"
+	typesensesearch "github.com/exepirit/report-search/internal/search/typesense"
 	"github.com/typesense/typesense-go/typesense"
 	"log/slog"
 	"os"
@@ -14,7 +15,8 @@ import (
 func main() {
 	typesenseURL := flag.String("typesense", "http://typesense:80", "Typesense entrypoint URL")
 	typesenseToken := flag.String("token", "apikey", "Typesense token")
-	countStr := flag.String("count", "2000", "Documents count")
+	countStr := flag.String("count", "50", "Documents count")
+	generatorType := flag.String("generator", "wikipedia", "Document generator type (wikipedia, gofakeit)")
 	flag.Parse()
 
 	count, err := strconv.Atoi(*countStr)
@@ -28,14 +30,14 @@ func main() {
 		typesense.WithAPIKey(*typesenseToken),
 	)
 
-	isCollectionExists, err := CheckCollectionExists(client, search.ReportsCollectionName)
+	isCollectionExists, err := CheckCollectionExists(client, typesensesearch.ReportsCollectionName)
 	if err != nil {
 		slog.Error("Cannot check collection existence", "err", err)
 		os.Exit(1)
 	}
 
 	if isCollectionExists {
-		_, err = client.Collection(search.ReportsCollectionName).Delete()
+		_, err = client.Collection(typesensesearch.ReportsCollectionName).Delete()
 		if err != nil {
 			slog.Error("Cannot delete collection",
 				"err", err)
@@ -43,7 +45,7 @@ func main() {
 		slog.Info("Collection deleted")
 	}
 
-	_, err = client.Collections().Create(search.ReportsCollectionSchema)
+	_, err = client.Collections().Create(typesensesearch.ReportsCollectionSchema)
 	if err != nil {
 		slog.Error("Cannot clear collection",
 			"err", err)
@@ -51,13 +53,13 @@ func main() {
 	}
 	slog.Info("Collection created")
 
-	var indexer search.ReportIndexer = &search.TypesenseReportIndexer{
+	var indexer search.Indexer[data.Report] = &typesensesearch.Indexer{
 		Client: client,
 	}
 
 	// fill with fake data
 	counter := 0
-	generator := fake.GofakeitGenerator{}
+	generator := SelectGenerator(*generatorType)
 	fake.IterateReports(generator, count, func(report data.Report) {
 		err = indexer.Index(report)
 		if err != nil {

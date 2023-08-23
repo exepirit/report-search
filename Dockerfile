@@ -10,7 +10,8 @@ COPY . ./
 FROM go-dev-env as go-builder
 
 RUN go build -o report-search ./cmd/report-search/
-RUN go build -o fill-data ./cmd/fill-data/
+RUN go build -o fill-typesense ./cmd/fill-typesense/
+RUN go build -o fill-meilisearch ./cmd/fill-meilisearch/
 
 FROM node:18.8.0 as js-builder
 
@@ -28,7 +29,8 @@ WORKDIR /app
 
 COPY ./entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
-COPY --from=go-builder /build/fill-data /app/fill-data
+COPY --from=go-builder /build/fill-typesense /app/fill-typesense
+COPY --from=go-builder /build/fill-meilisearch /app/fill-meilisearch
 COPY --from=go-builder /build/report-search /app/report-search
 COPY --from=js-builder /build/build /app/web/build
 
