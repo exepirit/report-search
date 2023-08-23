@@ -1,11 +1,14 @@
-package search
+package typesense
 
-import "github.com/typesense/typesense-go/typesense/api"
+import (
+	"github.com/exepirit/report-search/pkg/ref"
+	"github.com/typesense/typesense-go/typesense/api"
+)
 
 const ReportsCollectionName = "reports"
 
 var ReportsCollectionSchema = &api.CollectionSchema{
-	EnableNestedFields: boolRef(true),
+	EnableNestedFields: ref.Ref(true),
 	Fields: []api.Field{
 		{
 			Name: "id",
@@ -33,8 +36,4 @@ var ReportsCollectionSchema = &api.CollectionSchema{
 		},
 	},
 	Name: "reports",
-}
-
-func boolRef(val bool) *bool {
-	return &val
 }

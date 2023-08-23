@@ -1,8 +1,8 @@
-package search
+package typesense
 
 import "fmt"
 
-func ApplyTypesenseHighlights(document map[string]any, highlights map[string]any) map[string]any {
+func ApplyHighlights(document map[string]any, highlights map[string]any) map[string]any {
 	return applyStructHighlights(document, highlights)
 }
 

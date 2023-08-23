@@ -3,6 +3,7 @@ package v1
 import (
 	"github.com/exepirit/report-search/internal/infrastructure"
 	"github.com/exepirit/report-search/internal/search"
+	"github.com/exepirit/report-search/internal/search/typesense"
 	"github.com/gofiber/fiber/v2"
 	"log/slog"
 	"net/http"
@@ -18,9 +19,9 @@ func SearchReport(ctx *fiber.Ctx) error {
 			})
 	}
 
-	var reportSearch search.ReportSearch = &search.TypesenseReportSearch{
+	var reportSearch search.ReportSearch = &typesense.ReportSearch{
 		Client:             infrastructure.GetTypesenseClient(),
-		HighlightThreshold: 2000,
+		HighlightThreshold: 100000,
 	}
 
 	searchStart := time.Now()
