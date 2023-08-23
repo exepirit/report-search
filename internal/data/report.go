@@ -14,6 +14,10 @@ type Report struct {
 	Parts       []ReportPart `json:"parts"`
 }
 
+func (report Report) GetID() string {
+	return report.ID.String()
+}
+
 type ReportPeriod struct {
 	ID         uuid.UUID `json:"id"`
 	StartDate  time.Time `json:"startDate"`

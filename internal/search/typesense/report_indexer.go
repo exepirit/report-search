@@ -6,11 +6,11 @@ import (
 	"github.com/typesense/typesense-go/typesense"
 )
 
-type TypesenseReportIndexer struct {
+type Indexer struct {
 	Client *typesense.Client
 }
 
-func (idx *TypesenseReportIndexer) Index(report data.Report) error {
+func (idx Indexer) Index(report data.Report) error {
 	indexReport := index.MapReportToIndex(report)
 	_, err := idx.Client.Collection(ReportsCollectionName).
 		Documents().

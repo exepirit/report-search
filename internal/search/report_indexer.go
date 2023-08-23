@@ -1,9 +1,9 @@
 package search
 
-import (
-	"github.com/exepirit/report-search/internal/data"
-)
+type Indexer[T Identifiable] interface {
+	Index(document T) error
+}
 
-type ReportIndexer interface {
-	Index(report data.Report) error
+type Identifiable interface {
+	GetID() string
 }

@@ -49,9 +49,10 @@ func (query *ReportSearchQuery) GetAll() ([]data.Report, error) {
 		return nil, err
 	}
 
+	withHighlight := query.searchRequest.AttributesToHighlight != nil
 	reports := make([]data.Report, 0, len(result.Hits))
 	for _, hit := range result.Hits {
-		report, err := unmarshalHit[data.Report](hit)
+		report, err := unmarshalHit[data.Report](hit, withHighlight)
 		if err != nil {
 			return nil, errors.New("invalid data in index")
 		}
