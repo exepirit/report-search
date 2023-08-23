@@ -27,7 +27,6 @@ func (q *typesenseSearchQuery) ContainsText(text string) search.ReportSearchQuer
 func (q *typesenseSearchQuery) WrittenInPeriod(startDate, finishDate time.Time) search.ReportSearchQuery {
 	filterBy := fmt.Sprintf("period.deadline:>=%d && period.deadline:<=%d", startDate.Unix(), finishDate.Unix())
 	q.query.FilterBy = &filterBy
-	q.query.HighlightFields = &filterBy
 	return q
 }
 
