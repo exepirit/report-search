@@ -10,11 +10,13 @@ import (
 
 func main() {
 	typesenseURL := flag.String("typesense", "http://typesense:80", "Typesense entrypoint URL")
-	typesenseToken := flag.String("token", "apikey", "Typesense token")
+	apiToken := flag.String("token", "apikey", "API token")
+	meilisearchURL := flag.String("meilisearch", "http://meilisearch:7700", "Meilisearch URL")
 	listenAddress := flag.String("listen", ":80", "")
 	flag.Parse()
 
-	infrastructure.SetupTypesenseClient(*typesenseURL, *typesenseToken)
+	infrastructure.SetupTypesenseClient(*typesenseURL, *apiToken)
+	infrastructure.SetupMeilisearchClient(*meilisearchURL, *apiToken)
 
 	app := fiber.New(fiber.Config{
 		Prefork:       false,

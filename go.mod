@@ -9,6 +9,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.48.0
 	github.com/google/uuid v1.3.0
 	github.com/meilisearch/meilisearch-go v0.25.0
+	github.com/samber/lo v1.38.1
 	github.com/samber/mo v1.8.0
 	github.com/typesense/typesense-go v0.8.0
 )
@@ -30,5 +31,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.48.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
+	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/sys v0.10.0 // indirect
 )

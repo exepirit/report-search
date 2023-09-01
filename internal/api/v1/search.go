@@ -3,7 +3,7 @@ package v1
 import (
 	"github.com/exepirit/report-search/internal/infrastructure"
 	"github.com/exepirit/report-search/internal/search"
-	"github.com/exepirit/report-search/internal/search/typesense"
+	"github.com/exepirit/report-search/internal/search/meilisearch"
 	"github.com/gofiber/fiber/v2"
 	"log/slog"
 	"net/http"
@@ -19,9 +19,8 @@ func SearchReport(ctx *fiber.Ctx) error {
 			})
 	}
 
-	var reportSearch search.ReportSearch = &typesense.ReportSearch{
-		Client:             infrastructure.GetTypesenseClient(),
-		HighlightThreshold: 100000,
+	var reportSearch search.ReportSearch = &meilisearch.ReportSearch{
+		Client: infrastructure.GetMeilisearchClient(),
 	}
 
 	searchStart := time.Now()

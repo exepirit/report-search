@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"github.com/exepirit/report-search/internal/data"
 	"github.com/exepirit/report-search/internal/fake"
@@ -14,7 +15,7 @@ import (
 )
 
 func main() {
-	meilisearchURL := flag.String("meilisearch", "http://meilisearch:80", "Meilisearch URL")
+	meilisearchURL := flag.String("meilisearch", "http://meilisearch:7700", "Meilisearch URL")
 	meilisearchToken := flag.String("token", "apikey", "Meilisearch token")
 	countStr := flag.String("count", "50", "Documents count")
 	generatorType := flag.String("generator", "wikipedia", "Document generator type (wikipedia, gofakeit)")
@@ -59,7 +60,8 @@ func main() {
 	slog.Info("Index created")
 
 	var indexer search.Indexer[data.Report] = &meilisearch2.Indexer[data.Report]{
-		Client: client,
+		Client:   client,
+		IndexKey: meilisearch2.ReportIndexKey,
 	}
 
 	// fill with fake data
@@ -78,5 +80,14 @@ func main() {
 
 func CheckCollectionExists(client *meilisearch.Client, name string) (bool, error) {
 	_, err := client.GetIndex(name)
-	return false, err
+
+	meilisearchErr := new(meilisearch.Error)
+	if err != nil {
+		if errors.As(err, &meilisearchErr) && meilisearchErr.StatusCode == 404 {
+			return false, nil
+		}
+		return false, err
+	}
+
+	return true, nil
 }

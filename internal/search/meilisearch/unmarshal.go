@@ -10,7 +10,7 @@ func unmarshalHit[T any](hit interface{}, highlight bool) (T, error) {
 		hitMap = hitMap[highlightedAttribute].(map[string]any)
 	}
 
-	rawHit, _ := json.Marshal(hit)
+	rawHit, _ := json.Marshal(hitMap)
 	val := new(T)
 	return *val, json.Unmarshal(rawHit, val)
 }

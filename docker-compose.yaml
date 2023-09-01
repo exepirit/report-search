@@ -9,6 +9,26 @@ services:
       TYPESENSE_API_KEY: "apikey"
       TYPESENSE_DATA_DIR: "/tmp"
     command: "./typesense-server -p 80"
+  fill-typesense:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - typesense
+    command: "/app/fill-typesense"
+  meilisearch:
+    image: getmeili/meilisearch:v1.3
+    ports:
+      - "6081:7700"
+    environment:
+      MEILI_MASTER_KEY: "apikey"
+  fill-meilisearch:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - meilisearch
+    command: "/app/fill-meilisearch"
   application:
     build:
       context: .
@@ -16,5 +36,7 @@ services:
     ports:
       - "8080:80/tcp"
     environment:
+      DOCUMENTS_COUNT: 50
+      FAKE_DATA_GENERATOR: wikipedia
       TYPESENSE_URL: "http://typesense"
       TYPESENSE_APIKEY: "apikey"

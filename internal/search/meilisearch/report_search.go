@@ -7,12 +7,12 @@ import (
 )
 
 type ReportSearch struct {
-	client *meilisearch.Client
+	Client *meilisearch.Client
 }
 
 func (search *ReportSearch) Query() search.ReportSearchQuery {
 	return &ReportSearchQuery{
-		client: search.client,
+		client: search.Client,
 		text:   mo.None[string](),
 		searchRequest: &meilisearch.SearchRequest{
 			AttributesToHighlight: []string{},

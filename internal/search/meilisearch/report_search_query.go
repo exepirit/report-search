@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"github.com/exepirit/report-search/internal/data"
 	"github.com/exepirit/report-search/internal/search"
+	"github.com/exepirit/report-search/internal/search/index"
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/samber/mo"
+	"log/slog"
 	"time"
 )
 
@@ -35,6 +37,8 @@ func (query *ReportSearchQuery) WithHighlights() search.ReportSearchQuery {
 		"author.shortName",
 		"parts.content",
 	}
+	query.searchRequest.HighlightPreTag = "<mark>"
+	query.searchRequest.HighlightPostTag = "</mark>"
 	return query
 }
 
@@ -52,8 +56,15 @@ func (query *ReportSearchQuery) GetAll() ([]data.Report, error) {
 	withHighlight := query.searchRequest.AttributesToHighlight != nil
 	reports := make([]data.Report, 0, len(result.Hits))
 	for _, hit := range result.Hits {
-		report, err := unmarshalHit[data.Report](hit, withHighlight)
+		indexedReport, err := unmarshalHit[index.Report](hit, withHighlight)
 		if err != nil {
+			slog.Error("Invalid data in index", "err", err)
+			return nil, errors.New("invalid data in index")
+		}
+
+		report, err := index.MapReportFromIndex(indexedReport)
+		if err != nil {
+			slog.Error("Invalid data in index", "err", err)
 			return nil, errors.New("invalid data in index")
 		}
 
