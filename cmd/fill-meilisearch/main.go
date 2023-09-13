@@ -59,7 +59,7 @@ func main() {
 	}
 	slog.Info("Index created")
 
-	var indexer search.Indexer[data.Report] = &meilisearch2.Indexer[data.Report]{
+	var indexer search.Indexer[*data.Report] = &meilisearch2.Indexer[*data.Report]{
 		Client:   client,
 		IndexKey: meilisearch2.ReportIndexKey,
 	}
@@ -68,7 +68,7 @@ func main() {
 	counter := 0
 	generator := SelectGenerator(*generatorType)
 	fake.IterateReports(generator, count, func(report data.Report) {
-		err = indexer.Index(report)
+		err = indexer.Index(&report)
 		if err != nil {
 			slog.Error("Cannot index report", "err", err)
 		}

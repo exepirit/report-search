@@ -87,8 +87,11 @@ func (gen WikipediaGenerator) downloadArticleContent(title string) ([]string, er
 func (WikipediaGenerator) makeReport(title string, content []string) data.Report {
 	reportParts := make([]data.ReportPart, len(content))
 	for i, text := range content {
-		reportParts[i] = data.ReportPart{
-			ID:      uuid.New(),
+		reportParts[i] = data.TextReportPart{
+			BaseReportPart: data.BaseReportPart{
+				ID:   uuid.New(),
+				Type: data.ReportPartTypeText,
+			},
 			Content: text,
 		}
 	}

@@ -5,6 +5,8 @@ import (
 	"github.com/brianvoe/gofakeit"
 	"github.com/exepirit/report-search/internal/data"
 	"github.com/google/uuid"
+	"math/rand"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -34,7 +36,18 @@ func (gen GofakeitGenerator) GenerateReportParts() []data.ReportPart {
 	return parts
 }
 
-func (GofakeitGenerator) GenerateReportPart() data.ReportPart {
+func (gen GofakeitGenerator) GenerateReportPart() data.ReportPart {
+	switch rand.Int() % 2 {
+	case 0:
+		return gen.GenerateTextReportPart()
+	case 1:
+		return gen.GenerateImageReportPart()
+	default:
+		panic("undefined behaviour")
+	}
+}
+
+func (GofakeitGenerator) GenerateTextReportPart() data.ReportPart {
 	paragraphs := make([]string, 2)
 	for i := 0; i < len(paragraphs); i++ {
 		paragraphs[i] = gofakeit.Paragraph(
@@ -46,9 +59,23 @@ func (GofakeitGenerator) GenerateReportPart() data.ReportPart {
 		paragraphs[i] = fmt.Sprintf("<p>%s</p>", paragraphs[i])
 	}
 
-	return data.ReportPart{
-		ID:      uuid.New(),
+	return data.TextReportPart{
+		BaseReportPart: data.BaseReportPart{
+			ID:   uuid.New(),
+			Type: data.ReportPartTypeText,
+		},
 		Content: strings.Join(paragraphs, ""),
+	}
+}
+
+func (GofakeitGenerator) GenerateImageReportPart() data.ReportPart {
+	return data.ImageReportPart{
+		BaseReportPart: data.BaseReportPart{
+			ID:   uuid.New(),
+			Type: data.ReportPartTypeImage,
+		},
+		URL:   "https://via.placeholder.com/120x120&text=" + url.PathEscape(gofakeit.Sentence(2)),
+		Label: gofakeit.Sentence(3),
 	}
 }
 
